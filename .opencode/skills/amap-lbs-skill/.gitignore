@@ -1,0 +1,7 @@
+# 该文件可由 skill 在运行时写入，并可能包含 API Key。
+config.json
+
+# 仅提交无密钥模板。
+.env
+.env.*
+!.env.example
