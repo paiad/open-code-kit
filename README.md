@@ -1,11 +1,11 @@
-# opencode-kit
+# open-code-kit
 
 <p align="center">
-  <img src="./assets/opencode-kit-logo.png" width="180" alt="opencode-kit logo">
+  <img src="./assets/opencode-kit-logo.png" width="180" alt="open-code-kit logo">
 </p>
 
 <p align="center">
-  <em><strong>Reusable plugins and extensions</strong> for <a href="https://opencode.ai">OpenCode</a>.</em>
+  <em><strong>A curated skill kit and extension collection for OpenCode-compatible AI agents.</strong></em>
 </p>
 
 <p align="center">
@@ -15,41 +15,67 @@
   <img src="https://img.shields.io/badge/license-MIT-111111?style=flat-square" alt="MIT license">
 </p>
 
-`opencode-kit` is a monorepo for practical OpenCode extensions. It provides reusable plugins for inspecting sessions, rendering transcripts, and extending agent workflows.
+`open-code-kit` is a versioned collection of reusable agent skills plus practical OpenCode extensions. The skill kit covers engineering workflows, research, AI news, location services, persona-skill creation, and Feishu/Lark operations. The repository also ships `opencode-peek`, a plugin that renders a readable HTML transcript of an OpenCode session.
+
+## Skill kit
+
+| Area | Skills | Purpose |
+| --- | --- | --- |
+| Engineering | `brainstorming`, `grilling`, `tdd`, `diagnosing-bugs` | Shape work, stress-test designs, test changes, and investigate failures. |
+| Research | `agent-reach`, `aihot` | Route web research and retrieve current Chinese AI news. |
+| Creation | `nuwa-skill` | Distill a person's or topic's thinking framework into a reusable skill. |
+| Location | `amap-lbs-skill` | Search POIs, plan routes, and generate map links with Amap. |
+| Collaboration | `lark-skills` | Official Feishu/Lark CLI workflows for documents, Drive, tasks, calendar, IM, Base, slides, approvals, and more. |
+
+Each skill documents its own prerequisites, scope, and safety constraints in its `SKILL.md`.
+
+### Distribution layouts
+
+The same skill collection is available in two layouts:
+
+```text
+open-code-kit/
+├── .opencode/skills/     # Source of truth for OpenCode projects
+└── .agents/skills/       # Deep-copy distribution for agents that use .agents/
+```
+
+The directories are intentionally identical. Edit `.opencode/skills/` first, then synchronize the deep copy:
+
+```bash
+tar -C .opencode/skills -cf - . | tar -C .agents/skills -xf -
+```
+
+To consume the kit in another project, copy the entries you need into that project's `.opencode/skills/` directory, or use the `.agents/skills/` layout when the target agent discovers skills from `.agents/`.
+
+### Skill catalog
+
+| Skill | Description |
+| --- | --- |
+| [`agent-reach`](./.opencode/skills/agent-reach/SKILL.md) | Internet research router for web, social, video, GitHub, and other supported sources. |
+| [`aihot`](./.opencode/skills/aihot/SKILL.md) | Current Chinese AI industry news from the public AI HOT API. |
+| [`amap-lbs-skill`](./.opencode/skills/amap-lbs-skill/SKILL.md) | Amap POI search, nearby search, route planning, travel planning, and map visualization. |
+| [`brainstorming`](./.opencode/skills/brainstorming/SKILL.md) | Turn a vague idea into a validated design before implementation. |
+| [`diagnosing-bugs`](./.opencode/skills/diagnosing-bugs/SKILL.md) | Build a tight reproduction loop and identify the root cause of a bug or regression. |
+| [`grilling`](./.opencode/skills/grilling/SKILL.md) | Stress-test a plan or design one decision at a time. |
+| [`lark-skills`](./.opencode/skills/lark-skills) | Official 27-skill Feishu/Lark CLI suite. |
+| [`nuwa-skill`](./.opencode/skills/nuwa-skill/SKILL.md) | Generate a high-fidelity person or topic perspective skill through research and validation. |
+| [`tdd`](./.opencode/skills/tdd/SKILL.md) | Apply a red-green-refactor workflow to features, fixes, and refactors. |
+
+### Amap configuration
+
+`amap-lbs-skill` does not contain an API key. To use Amap Web Service APIs, create a local `.env` from the provided template and enter your own key:
+
+```bash
+cp .opencode/skills/amap-lbs-skill/.env.example .opencode/skills/amap-lbs-skill/.env
+```
+
+Never commit the resulting `.env` or a generated `config.json`.
 
 ## Packages
 
 | Package | Description | Install |
 | --- | --- | --- |
 | [`opencode-peek`](./packages/opencode-peek) | Render the current OpenCode session as a readable HTML transcript with token usage and model avatars. | `opencode plugin opencode-peek` |
-
-## Agents and skills
-
-This repository also includes reusable agents and skills for OpenCode workflows. Copy or link the entries you need into your project's `.agents/` or `skills/` directory, then invoke them by name from your OpenCode agent.
-
-### Agents
-
-| Agent | Description | Reference |
-| --- | --- | --- |
-| `apollo` | Observes images and screenshots, reads visible text, and separates confirmed facts from uncertain points. | [`agents/apollo.md`](./.agents/apollo.md) |
-
-### Skills
-
-| Skill | Description | Reference |
-| --- | --- | --- |
-| `brainstorming` | Turns vague ideas into validated designs and implementation-ready specifications through guided questions. | [`skills/brainstorming/SKILL.md`](./skills/brainstorming/SKILL.md) |
-| `grilling` | Stress-tests a plan or design one decision at a time before implementation. | [`skills/grilling/SKILL.md`](./skills/grilling/SKILL.md) |
-| `video-download` | Downloads video, audio, subtitles, or metadata from YouTube and other sites with `yt-dlp`. | [`skills/video-download/SKILL.md`](./skills/video-download/SKILL.md) |
-| `video-understand` | Extracts video frames and optionally transcribes audio locally with FFmpeg and Whisper. | [`skills/video-understand/SKILL.md`](./skills/video-understand/SKILL.md) |
-
-For example, after installing `yt-dlp` and FFmpeg, use `video-download` to save a source video and `video-understand` to inspect its frames and transcript:
-
-```bash
-yt-dlp "VIDEO_URL" -o "video.mp4" --merge-output-format mp4
-python3 skills/video-understand/scripts/understand_video.py video.mp4
-```
-
-See each skill's `SKILL.md` for prerequisites, options, and workflow-specific guidance.
 
 ## Peek
 
@@ -162,17 +188,13 @@ These files are local artifacts and should not be committed.
 ## Repository structure
 
 ```text
-opencode-kit/
+open-code-kit/
 ├── assets/                         # Root README assets
-├── .agents/                        # Reusable OpenCode subagents
-│   └── apollo.md                   # Visual observation agent
-├── skills/                         # Reusable OpenCode skills
-│   ├── brainstorming/              # Shape ideas into designs
-│   ├── grilling/                   # Stress-test plans and designs
-│   ├── video-download/             # Download video and audio
-│   └── video-understand/           # Extract frames and transcribe video
+├── .agents/skills/                 # Deep-copy skill distribution
 ├── .opencode/
-│   └── opencode.json                 # Project configuration, including /peek
+│   ├── .agents/                    # OpenCode project agents
+│   ├── skills/                     # Canonical skill collection
+│   └── opencode.json               # Project configuration, including /peek
 ├── packages/
 │   └── opencode-peek/
 │       ├── src/                    # Plugin source and runtime modules

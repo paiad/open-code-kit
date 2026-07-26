@@ -1,11 +1,11 @@
-# opencode-kit
+# open-code-kit
 
 <p align="center">
-  <img src="./assets/opencode-kit-logo.png" width="180" alt="opencode-kit logo">
+  <img src="./assets/opencode-kit-logo.png" width="180" alt="open-code-kit logo">
 </p>
 
 <p align="center">
-  <em><strong>面向 <a href="https://opencode.ai">OpenCode</a> 的可复用插件与扩展集合</strong>。</em>
+  <em><strong>面向 OpenCode 兼容 AI Agent 的可复用 skill kit 与扩展集合</strong>。</em>
 </p>
 
 <p align="center">
@@ -15,7 +15,61 @@
   <img src="https://img.shields.io/badge/license-MIT-111111?style=flat-square" alt="MIT license">
 </p>
 
-`opencode-kit` 是一个面向 OpenCode 的 monorepo，提供用于会话检查、 transcript 渲染和 Agent 工作流扩展的可复用插件。
+`open-code-kit` 是一个版本化的可复用 Agent skill 集合，同时提供实用的 OpenCode 扩展。Skill kit 覆盖工程工作流、调研、AI 资讯、位置服务、人物/主题 skill 创建，以及飞书/Lark 操作；仓库还包含 `opencode-peek`，用于渲染可读的 OpenCode 会话 transcript。
+
+## Skill kit
+
+| 分类 | Skill | 用途 |
+| --- | --- | --- |
+| 工程 | `brainstorming`、`grilling`、`tdd`、`diagnosing-bugs` | 梳理需求、压力测试设计、测试驱动开发与故障诊断。 |
+| 调研 | `agent-reach`、`aihot` | 路由互联网调研，并获取最新中文 AI 资讯。 |
+| 创作 | `nuwa-skill` | 将人物或主题的思维框架提炼成可复用 skill。 |
+| 位置服务 | `amap-lbs-skill` | 高德 POI 搜索、路线规划与地图链接生成。 |
+| 协作 | `lark-skills` | 官方飞书/Lark CLI 工作流：文档、云盘、任务、日历、IM、Base、幻灯片、审批等。 |
+
+每个 skill 的前置条件、作用范围和安全约束都写在自身的 `SKILL.md` 中。
+
+### 分发目录
+
+同一份 skill 集合提供两种目录布局：
+
+```text
+open-code-kit/
+├── .opencode/skills/     # OpenCode 项目的源目录
+└── .agents/skills/       # 面向使用 .agents/ 的 Agent 的深拷贝分发目录
+```
+
+两处内容应保持一致。更新 skill 时，先修改 `.opencode/skills/`，再同步深拷贝：
+
+```bash
+tar -C .opencode/skills -cf - . | tar -C .agents/skills -xf -
+```
+
+将 kit 用于其他项目时，可把所需条目复制到目标项目的 `.opencode/skills/`；如果目标 Agent 从 `.agents/` 发现 skill，则使用 `.agents/skills/` 目录。
+
+### Skill 清单
+
+| Skill | 说明 |
+| --- | --- |
+| [`agent-reach`](./.opencode/skills/agent-reach/SKILL.md) | 面向网页、社交媒体、视频、GitHub 等来源的互联网调研路由器。 |
+| [`aihot`](./.opencode/skills/aihot/SKILL.md) | 通过公开 AI HOT API 获取最新中文 AI 行业资讯。 |
+| [`amap-lbs-skill`](./.opencode/skills/amap-lbs-skill/SKILL.md) | 高德 POI、周边搜索、路线规划、旅行规划和地图可视化。 |
+| [`brainstorming`](./.opencode/skills/brainstorming/SKILL.md) | 在实现前将模糊想法转化为经过验证的设计。 |
+| [`diagnosing-bugs`](./.opencode/skills/diagnosing-bugs/SKILL.md) | 构建稳定复现并定位 Bug 或性能回归的根因。 |
+| [`grilling`](./.opencode/skills/grilling/SKILL.md) | 逐项压力测试计划或设计。 |
+| [`lark-skills`](./.opencode/skills/lark-skills) | 官方 27 项飞书/Lark CLI skill 套件。 |
+| [`nuwa-skill`](./.opencode/skills/nuwa-skill/SKILL.md) | 通过调研与验证生成高保真的人物或主题视角 skill。 |
+| [`tdd`](./.opencode/skills/tdd/SKILL.md) | 对功能、修复和重构应用红绿重构工作流。 |
+
+### 高德配置
+
+`amap-lbs-skill` 不包含 API Key。使用高德 Web 服务 API 时，从模板创建本地 `.env` 并填写自己的 Key：
+
+```bash
+cp .opencode/skills/amap-lbs-skill/.env.example .opencode/skills/amap-lbs-skill/.env
+```
+
+不要提交生成的 `.env` 或 `config.json`。
 
 ## 插件
 
@@ -134,10 +188,13 @@ opencode plugin opencode-peek
 ## 仓库结构
 
 ```text
-opencode-kit/
+open-code-kit/
 ├── assets/                         # 根 README 资源
+├── .agents/skills/                 # 深拷贝 skill 分发目录
 ├── .opencode/
-│   └── opencode.json                 # 项目配置，包含 /peek command
+│   ├── .agents/                    # OpenCode 项目 Agent
+│   ├── skills/                     # 规范 skill 集合
+│   └── opencode.json               # 项目配置，包含 /peek command
 ├── packages/
 │   └── opencode-peek/
 │       ├── src/                    # 插件源码与运行时模块
