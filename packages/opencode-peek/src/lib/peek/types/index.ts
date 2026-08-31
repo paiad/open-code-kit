@@ -21,6 +21,10 @@ export type PeekPartState = {
 }
 
 export type PeekMessagePart = {
+  id?: string
+  sessionID?: string
+  messageID?: string
+  callID?: string
   type?: string
   text?: string
   tool?: string
@@ -61,4 +65,3 @@ export type PeekMarker = {
   id: string
   label: string
 }
-

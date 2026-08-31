@@ -6,6 +6,8 @@ dist/
 .opencode/tests/
 packages/opencode-peek/tests/
 packages/opencode-peek/dist-tests/
+!packages/opencode-peek/tests/
+!packages/opencode-peek/tests/*.test.ts
 .opencode/.env
 .opencode/.env.*
 !.opencode/.env.example

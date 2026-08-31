@@ -196,9 +196,25 @@ function renderToolOutput(output: unknown, preferredFormat: unknown, existingPre
   return `${preview}${jsonDetails("Raw output", output ?? null)}`;
 }
 
+function identifierValue(part: Record<string, unknown>, key: "id" | "callID"): string {
+  const value = part[key];
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function shortIdentifier(value: string): string {
+  return value.length > 16 ? `${value.slice(0, 16)}…` : value;
+}
+
+function renderIdentifier(kind: "Part" | "Call", value: string): string {
+  if (!value) return "";
+  const noun = kind === "Part" ? "part ID" : "tool call ID";
+  return `<button class="identifier-copy identifier-copy-${kind.toLowerCase()}" type="button" data-copy-value="${escapeHtml(value)}" data-copy-kind="${kind}" title="Copy full ${noun}: ${escapeHtml(value)}" aria-label="Copy full ${noun}: ${escapeHtml(value)}"><span class="identifier-kind">${kind}</span><span class="identifier-value" aria-hidden="true">${escapeHtml(shortIdentifier(value))}</span></button>`;
+}
+
 function renderToolPart(part: Record<string, unknown>): string {
   const toolName = typeof part.tool === "string" && part.tool.trim() ? part.tool.trim() : "tool";
-  const partId = typeof part.id === "string" ? part.id.trim() : "";
+  const partId = identifierValue(part, "id");
+  const callId = identifierValue(part, "callID");
   const state = isObject(part.state) ? part.state : {};
   const output = parseJsonMaybe(state.output);
   const normalized = unwrapEnvelope(output);
@@ -210,7 +226,7 @@ function renderToolPart(part: Record<string, unknown>): string {
   const displayName = normalized.skill || toolName;
   const resourcePreview = renderResourcePreview(output, typeof output === "string" ? { imagesOnly: true } : undefined);
   return `<details class="part tool-part ${color.className}"${resourcePreview ? " open" : ""}>
-    <summary><span class="tool-title"><span>${escapeHtml(toolName)}</span>${partId ? `<span class="part-id">(${escapeHtml(partId)})</span>` : ""}${skillName ? `<span class="tool-skill-name">(${escapeHtml(skillName)})</span>` : ""}${outputType ? `<span class="tool-type">${escapeHtml(outputType)}</span>` : ""}</span>${typeof state.status === "string" ? `<span class="badge">${escapeHtml(state.status)}</span>` : ""}</summary>
+    <summary><span class="tool-title"><span>${escapeHtml(toolName)}</span>${renderIdentifier("Part", partId)}${renderIdentifier("Call", callId)}${skillName ? `<span class="tool-skill-name">(${escapeHtml(skillName)})</span>` : ""}${outputType ? `<span class="tool-type">${escapeHtml(outputType)}</span>` : ""}</span>${typeof state.status === "string" ? `<span class="badge">${escapeHtml(state.status)}</span>` : ""}</summary>
     <div class="tool-body">${hasInput ? `<section class="tool-section tool-input">${jsonDetails(`${displayName} input`, state.input)}</section>` : ""}<section class="tool-section tool-output"><div class="tool-caption">${escapeHtml(displayName)} output</div>${renderToolOutput(output, input.format, resourcePreview)}</section></div>
   </details>`;
 }
@@ -338,7 +354,7 @@ function renderDocument(snapshot: unknown, context: RenderContext, avatarSvgMap?
 }
 
 function clientScript(): string {
-  return `(() => { const copy = async text => { if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text); const area = document.createElement('textarea'); area.value = text; document.body.append(area); area.select(); document.execCommand('copy'); area.remove(); }; document.querySelectorAll('.json-copy').forEach(button => button.addEventListener('click', async () => { const text = button.parentElement?.querySelector('code')?.textContent || ''; if (!text) return; await copy(text); button.classList.add('is-copied'); button.textContent = 'Copied'; setTimeout(() => { button.classList.remove('is-copied'); button.textContent = 'Copy JSON'; }, 1200); })); document.querySelectorAll('[data-target]').forEach(button => button.addEventListener('click', () => document.getElementById(button.dataset.target)?.scrollIntoView({ behavior: 'smooth', block: 'start' }))); const dialog = document.querySelector('.image-lightbox'); const image = document.querySelector('.image-lightbox-image'); document.querySelectorAll('.file-preview-trigger').forEach(button => button.addEventListener('click', () => { image.src = button.dataset.previewSrc; image.alt = button.dataset.previewAlt || ''; dialog.showModal(); })); document.querySelector('.image-lightbox-close')?.addEventListener('click', () => dialog.close()); })();`;
+  return `(() => { const copy = async text => { if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text); const area = document.createElement('textarea'); area.value = text; document.body.append(area); area.select(); document.execCommand('copy'); area.remove(); }; const copied = (button, label) => { button.classList.add('is-copied'); button.dataset.copyLabel = label; setTimeout(() => { button.classList.remove('is-copied'); delete button.dataset.copyLabel; }, 1200); }; document.querySelectorAll('.json-copy').forEach(button => button.addEventListener('click', async () => { const text = button.parentElement?.querySelector('code')?.textContent || ''; if (!text) return; await copy(text); button.classList.add('is-copied'); button.textContent = 'Copied'; setTimeout(() => { button.classList.remove('is-copied'); button.textContent = 'Copy JSON'; }, 1200); })); document.querySelectorAll('.identifier-copy').forEach(button => button.addEventListener('click', async event => { event.preventDefault(); event.stopPropagation(); const value = button.dataset.copyValue || ''; if (!value) return; await copy(value); copied(button, 'Copied'); })); document.querySelectorAll('[data-target]').forEach(button => button.addEventListener('click', () => document.getElementById(button.dataset.target)?.scrollIntoView({ behavior: 'smooth', block: 'start' }))); const dialog = document.querySelector('.image-lightbox'); const image = document.querySelector('.image-lightbox-image'); document.querySelectorAll('.file-preview-trigger').forEach(button => button.addEventListener('click', () => { image.src = button.dataset.previewSrc; image.alt = button.dataset.previewAlt || ''; dialog.showModal(); })); document.querySelector('.image-lightbox-close')?.addEventListener('click', () => dialog.close()); })();`;
 }
 
 export async function runRenderSession(nextSnapshotPath: string, outputPathArg?: string, options: PeekRenderOptions = {}): Promise<string> {
