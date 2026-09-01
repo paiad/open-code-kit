@@ -31,6 +31,7 @@
 | 协作 | [`lark-skills`](./.opencode/skills/lark-skills) | 飞书/Lark CLI 工作流：文档、云盘、任务、日历、IM 等。 | [larksuite/cli](https://github.com/larksuite/cli) |
 | 创作 | [`nuwa-skill`](./.opencode/skills/nuwa-skill/SKILL.md) | 将人物或主题的思维框架提炼为 skill。 | [alchaincyf/nuwa-skill](https://github.com/alchaincyf/nuwa-skill) |
 | 工程 | [`tdd`](./.opencode/skills/tdd/SKILL.md) | 以 seam 为中心运行 red → green 测试开发循环。 | [mattpocock/skills](https://github.com/mattpocock/skills/tree/main/skills/engineering/tdd) |
+| 文档 | [`writing-for-agents`](./.opencode/skills/writing-for-agents/SKILL.md) | 为 skill 和 Agent 文档建立清晰、稳定的上下文。 | [mattpocock/skills](https://github.com/mattpocock/skills/tree/main/skills/productivity/writing-for-agents) |
 
 <sub>来源最近核验于 2026-08-31。此清单是经过筛选的快照；上游 skill 此后可能已更新。</sub>
 

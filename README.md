@@ -31,6 +31,7 @@ The catalog is the source of truth for provenance and freshness. Each `SKILL.md`
 | Collaboration | [`lark-skills`](./.opencode/skills/lark-skills) | Feishu/Lark CLI workflows for documents, Drive, tasks, calendar, IM, and more. | [larksuite/cli](https://github.com/larksuite/cli) |
 | Creation | [`nuwa-skill`](./.opencode/skills/nuwa-skill/SKILL.md) | Distills a person's or topic's thinking framework into a skill. | [alchaincyf/nuwa-skill](https://github.com/alchaincyf/nuwa-skill) |
 | Engineering | [`tdd`](./.opencode/skills/tdd/SKILL.md) | Runs a seam-focused red → green test-development loop. | [mattpocock/skills](https://github.com/mattpocock/skills/tree/main/skills/engineering/tdd) |
+| Documentation | [`writing-for-agents`](./.opencode/skills/writing-for-agents/SKILL.md) | Writes skills and agent-facing documents with clear, stable context. | [mattpocock/skills](https://github.com/mattpocock/skills/tree/main/skills/productivity/writing-for-agents) |
 
 <sub>Sources last verified on 2026-08-31. This catalog is a curated snapshot; upstream skills may have changed since then.</sub>
 
